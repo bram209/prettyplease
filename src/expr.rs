@@ -1,6 +1,7 @@
 use crate::algorithm::{BreakToken, Printer};
 use crate::attr;
 use crate::iter::IterDelimited;
+use crate::path::PathKind;
 use crate::stmt;
 use crate::INDENT;
 use proc_macro2::TokenStream;
@@ -12,7 +13,7 @@ use syn::{
     ExprMacro, ExprMatch, ExprMethodCall, ExprParen, ExprPath, ExprRange, ExprReference,
     ExprRepeat, ExprReturn, ExprStruct, ExprTry, ExprTryBlock, ExprTuple, ExprType, ExprUnary,
     ExprUnsafe, ExprWhile, ExprYield, FieldValue, GenericMethodArgument, Index, Label, Member,
-    MethodTurbofish, PathArguments, QSelf, RangeLimits, ReturnType, Stmt, Token, UnOp,
+    MethodTurbofish, QSelf, RangeLimits, ReturnType, Stmt, Token, UnOp,
 };
 
 impl Printer {
@@ -90,8 +91,6 @@ impl Printer {
         }
     }
 
-    // If the given expression is a bare `ExprStruct`, wraps it in parenthesis
-    // before appending it to `TokenStream`.
     fn wrap_exterior_struct(&mut self, expr: &Expr) {
         let needs_paren = contains_exterior_struct_lit(expr);
         if needs_paren {
@@ -539,7 +538,7 @@ impl Printer {
 
     fn expr_path(&mut self, expr: &ExprPath) {
         self.outer_attrs(&expr.attrs);
-        self.qpath(&expr.qself, &expr.path);
+        self.qpath(&expr.qself, &expr.path, PathKind::Expr);
     }
 
     fn expr_range(&mut self, expr: &ExprRange) {
@@ -591,7 +590,7 @@ impl Printer {
         self.outer_attrs(&expr.attrs);
         self.cbox(INDENT);
         self.ibox(-INDENT);
-        self.qpath(qself, &expr.path);
+        self.qpath(qself, &expr.path, PathKind::Expr);
         self.end();
         self.word(" {");
         self.space_if_nonempty();
@@ -1181,10 +1180,9 @@ fn is_short_ident(expr: &Expr) -> bool {
             && expr.path.leading_colon.is_none()
             && expr.path.segments.len() == 1
             && expr.path.segments[0].ident.to_string().len() as isize <= INDENT
+            && expr.path.segments[0].arguments.is_none()
         {
-            if let PathArguments::None = expr.path.segments[0].arguments {
-                return true;
-            }
+            return true;
         }
     }
     false

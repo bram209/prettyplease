@@ -1,32 +1,43 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::INDENT;
+use std::ptr;
 use syn::{
     AngleBracketedGenericArguments, Binding, Constraint, Expr, GenericArgument,
     ParenthesizedGenericArguments, Path, PathArguments, PathSegment, QSelf,
 };
 
+#[derive(Copy, Clone, PartialEq)]
+pub enum PathKind {
+    // a::B
+    Simple,
+    // a::B<T>
+    Type,
+    // a::B::<T>
+    Expr,
+}
+
 impl Printer {
-    pub fn path(&mut self, path: &Path) {
+    pub fn path(&mut self, path: &Path, kind: PathKind) {
         assert!(!path.segments.is_empty());
         for segment in path.segments.iter().delimited() {
             if !segment.is_first || path.leading_colon.is_some() {
                 self.word("::");
             }
-            self.path_segment(&segment);
+            self.path_segment(&segment, kind);
         }
     }
 
-    pub fn path_segment(&mut self, segment: &PathSegment) {
+    pub fn path_segment(&mut self, segment: &PathSegment, kind: PathKind) {
         self.ident(&segment.ident);
-        self.path_arguments(&segment.arguments);
+        self.path_arguments(&segment.arguments, kind);
     }
 
-    fn path_arguments(&mut self, arguments: &PathArguments) {
+    fn path_arguments(&mut self, arguments: &PathArguments, kind: PathKind) {
         match arguments {
             PathArguments::None => {}
             PathArguments::AngleBracketed(arguments) => {
-                self.angle_bracketed_generic_arguments(arguments);
+                self.angle_bracketed_generic_arguments(arguments, kind);
             }
             PathArguments::Parenthesized(arguments) => {
                 self.parenthesized_generic_arguments(arguments);
@@ -56,12 +67,16 @@ impl Printer {
         }
     }
 
-    fn angle_bracketed_generic_arguments(&mut self, generic: &AngleBracketedGenericArguments) {
-        if generic.args.is_empty() {
+    fn angle_bracketed_generic_arguments(
+        &mut self,
+        generic: &AngleBracketedGenericArguments,
+        path_kind: PathKind,
+    ) {
+        if generic.args.is_empty() || path_kind == PathKind::Simple {
             return;
         }
 
-        if generic.colon2_token.is_some() {
+        if path_kind == PathKind::Expr {
             self.word("::");
         }
         self.word("<");
@@ -73,38 +88,26 @@ impl Printer {
         //
         // TODO: ordering rules for const arguments vs type arguments have
         // not been settled yet. https://github.com/rust-lang/rust/issues/44580
-        for arg in generic.args.iter().delimited() {
-            match *arg {
-                GenericArgument::Lifetime(_) => {
-                    self.generic_argument(&arg);
-                    self.trailing_comma(arg.is_last);
-                }
-                GenericArgument::Type(_)
-                | GenericArgument::Binding(_)
-                | GenericArgument::Constraint(_)
-                | GenericArgument::Const(_) => {}
+        #[derive(Ord, PartialOrd, Eq, PartialEq)]
+        enum Group {
+            First,
+            Second,
+            Third,
+        }
+        fn group(arg: &GenericArgument) -> Group {
+            match arg {
+                GenericArgument::Lifetime(_) => Group::First,
+                GenericArgument::Type(_) | GenericArgument::Const(_) => Group::Second,
+                GenericArgument::Binding(_) | GenericArgument::Constraint(_) => Group::Third,
             }
         }
-        for arg in generic.args.iter().delimited() {
-            match *arg {
-                GenericArgument::Type(_) | GenericArgument::Const(_) => {
-                    self.generic_argument(&arg);
-                    self.trailing_comma(arg.is_last);
+        let last = generic.args.iter().max_by_key(|param| group(param));
+        for current_group in [Group::First, Group::Second, Group::Third] {
+            for arg in &generic.args {
+                if group(arg) == current_group {
+                    self.generic_argument(arg);
+                    self.trailing_comma(ptr::eq(arg, last.unwrap()));
                 }
-                GenericArgument::Lifetime(_)
-                | GenericArgument::Binding(_)
-                | GenericArgument::Constraint(_) => {}
-            }
-        }
-        for arg in generic.args.iter().delimited() {
-            match *arg {
-                GenericArgument::Binding(_) | GenericArgument::Constraint(_) => {
-                    self.generic_argument(&arg);
-                    self.trailing_comma(arg.is_last);
-                }
-                GenericArgument::Lifetime(_)
-                | GenericArgument::Type(_)
-                | GenericArgument::Const(_) => {}
             }
         }
 
@@ -148,11 +151,11 @@ impl Printer {
         self.end();
     }
 
-    pub fn qpath(&mut self, qself: &Option<QSelf>, path: &Path) {
+    pub fn qpath(&mut self, qself: &Option<QSelf>, path: &Path, kind: PathKind) {
         let qself = match qself {
             Some(qself) => qself,
             None => {
-                self.path(path);
+                self.path(path, kind);
                 return;
             }
         };
@@ -169,7 +172,7 @@ impl Printer {
                 if !segment.is_first || path.leading_colon.is_some() {
                     self.word("::");
                 }
-                self.path_segment(&segment);
+                self.path_segment(&segment, kind);
                 if segment.is_last {
                     self.word(">");
                 }
@@ -179,7 +182,7 @@ impl Printer {
         }
         for segment in segments {
             self.word("::");
-            self.path_segment(segment);
+            self.path_segment(segment, kind);
         }
     }
 }

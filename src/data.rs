@@ -1,10 +1,8 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
+use crate::path::PathKind;
 use crate::INDENT;
-use syn::{
-    Field, Fields, FieldsUnnamed, PathArguments, Variant, VisCrate, VisPublic, VisRestricted,
-    Visibility,
-};
+use syn::{Field, Fields, FieldsUnnamed, Variant, VisCrate, VisPublic, VisRestricted, Visibility};
 
 impl Printer {
     pub fn variant(&mut self, variant: &Variant) {
@@ -81,7 +79,7 @@ impl Printer {
         self.word("pub(");
         let omit_in = vis.path.leading_colon.is_none()
             && vis.path.segments.len() == 1
-            && matches!(vis.path.segments[0].arguments, PathArguments::None)
+            && vis.path.segments[0].arguments.is_none()
             && matches!(
                 vis.path.segments[0].ident.to_string().as_str(),
                 "self" | "super" | "crate",
@@ -89,7 +87,7 @@ impl Printer {
         if !omit_in {
             self.word("in ");
         }
-        self.path(&vis.path);
+        self.path(&vis.path, PathKind::Simple);
         self.word(") ");
     }
 }

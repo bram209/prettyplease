@@ -1,6 +1,8 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
+use crate::path::PathKind;
 use crate::INDENT;
+use std::ptr;
 use syn::{
     BoundLifetimes, ConstParam, GenericParam, Generics, LifetimeDef, PredicateEq,
     PredicateLifetime, PredicateType, TraitBound, TraitBoundModifier, TypeParam, TypeParamBound,
@@ -22,19 +24,24 @@ impl Printer {
         //
         // TODO: ordering rules for const parameters vs type parameters have
         // not been settled yet. https://github.com/rust-lang/rust/issues/44580
-        for param in generics.params.iter().delimited() {
-            if let GenericParam::Lifetime(_) = *param {
-                self.generic_param(&param);
-                self.trailing_comma(param.is_last);
+        #[derive(Ord, PartialOrd, Eq, PartialEq)]
+        enum Group {
+            First,
+            Second,
+        }
+        fn group(param: &GenericParam) -> Group {
+            match param {
+                GenericParam::Lifetime(_) => Group::First,
+                GenericParam::Type(_) | GenericParam::Const(_) => Group::Second,
             }
         }
-        for param in generics.params.iter().delimited() {
-            match *param {
-                GenericParam::Type(_) | GenericParam::Const(_) => {
-                    self.generic_param(&param);
-                    self.trailing_comma(param.is_last);
+        let last = generics.params.iter().max_by_key(|param| group(param));
+        for current_group in [Group::First, Group::Second] {
+            for param in &generics.params {
+                if group(param) == current_group {
+                    self.generic_param(param);
+                    self.trailing_comma(ptr::eq(param, last.unwrap()));
                 }
-                GenericParam::Lifetime(_) => {}
             }
         }
 
@@ -122,7 +129,7 @@ impl Printer {
             if !segment.is_first || trait_bound.path.leading_colon.is_some() {
                 self.word("::");
             }
-            self.path_segment(&segment);
+            self.path_segment(&segment, PathKind::Type);
         }
         if trait_bound.paren_token.is_some() {
             self.word(")");
