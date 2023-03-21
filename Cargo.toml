@@ -1,17 +1,17 @@
 [package]
-name = "prettyplease"
+name = "leptosfmt-prettyplease"
 version = "0.1.25"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 autoexamples = false
 categories = ["development-tools"]
-description = "A minimal `syn` syntax tree pretty-printer"
+description = "A fork of David Tolnay's prettyplease that adds the ability to format single expressions"
 documentation = "https://docs.rs/prettyplease"
 edition = "2021"
 exclude = ["cargo-expand"]
 keywords = ["rustfmt"]
 license = "MIT OR Apache-2.0"
 links = "prettyplease01"
-repository = "https://github.com/dtolnay/prettyplease"
+repository = "https://github.com/bram209/prettyplease"
 rust-version = "1.56"
 
 [features]
