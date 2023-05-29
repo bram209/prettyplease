@@ -1,7 +1,7 @@
 use crate::path::PathKind;
 use crate::token::Token;
 use crate::INDENT;
-use crate::{algorithm::Printer, iter::IterDelimited};
+use crate::{algorithm::Printer};
 use proc_macro2::{Delimiter, Spacing, TokenStream};
 use syn::{Ident, Macro, MacroDelimiter};
 

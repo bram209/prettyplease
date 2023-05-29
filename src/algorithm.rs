@@ -20,7 +20,7 @@ impl Printer {
         }
     }
 
-    pub fn eof(mut self) -> String {
+    pub fn eof(self) -> String {
         self.inner.eof()
     }
 
