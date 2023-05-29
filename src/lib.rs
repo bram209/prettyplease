@@ -360,7 +360,7 @@ mod stmt;
 mod token;
 mod ty;
 
-use crate::algorithm::Printer;
+use crate::algorithm::{MacroFormatter, Printer};
 use syn::{Expr, File};
 
 // Target line width.
@@ -372,12 +372,20 @@ const INDENT: isize = 4;
 // Every line is allowed at least this much space, even if highly indented.
 const MIN_SPACE: isize = 60;
 
-pub fn unparse(file: &File, printer: &mut leptosfmt_pretty_printer::Printer) {
-    let mut p = Printer::new(printer);
+pub fn unparse(
+    file: &File,
+    printer: &mut leptosfmt_pretty_printer::Printer,
+    macro_formatter: Option<Box<dyn MacroFormatter>>,
+) {
+    let mut p = Printer::new(printer, macro_formatter);
     p.file(file);
 }
 
-pub fn unparse_expr(file: &Expr, printer: &mut leptosfmt_pretty_printer::Printer) {
-    let mut p = Printer::new(printer);
+pub fn unparse_expr(
+    file: &Expr,
+    printer: &mut leptosfmt_pretty_printer::Printer,
+    macro_formatter: Option<Box<dyn MacroFormatter>>,
+) {
+    let mut p = Printer::new(printer, macro_formatter);
     p.expr(file);
 }

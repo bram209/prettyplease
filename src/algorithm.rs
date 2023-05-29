@@ -13,10 +13,13 @@ pub struct Printer<'a> {
 }
 
 impl<'a> Printer<'a> {
-    pub fn new(printer: &'a mut leptosfmt_pretty_printer::Printer) -> Self {
+    pub fn new(
+        printer: &'a mut leptosfmt_pretty_printer::Printer,
+        macro_formatter: Option<Box<dyn MacroFormatter>>,
+    ) -> Self {
         Self {
             inner: printer,
-            macro_formatter: None,
+            macro_formatter,
         }
     }
 
