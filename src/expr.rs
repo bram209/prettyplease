@@ -1,9 +1,10 @@
-use crate::algorithm::{BreakToken, Printer};
+use crate::algorithm::Printer;
 use crate::attr;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
 use crate::stmt;
 use crate::INDENT;
+use leptosfmt_pretty_printer::BreakToken;
 use proc_macro2::TokenStream;
 use syn::punctuated::Punctuated;
 use syn::{

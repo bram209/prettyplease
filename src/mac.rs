@@ -1,7 +1,7 @@
-use crate::algorithm::Printer;
 use crate::path::PathKind;
 use crate::token::Token;
 use crate::INDENT;
+use crate::{algorithm::Printer, iter::IterDelimited};
 use proc_macro2::{Delimiter, Spacing, TokenStream};
 use syn::{Ident, Macro, MacroDelimiter};
 
@@ -13,6 +13,23 @@ impl Printer {
                 return;
             }
         }
+
+        // let path_as_str = mac
+        //     .path
+        //     .segments
+        //     .iter()
+        //     .delimited()
+        //     .map(|segment| segment.ident.to_string())
+        //     .collect::<Vec<_>>()
+        //     .join("::");
+
+        if let Some(macro_formatter) = &self.macro_formatter {
+            if macro_formatter.accept(mac) {
+                macro_formatter.format(&mut self.inner, mac);
+                return;
+            }
+        }
+
         self.path(&mac.path, PathKind::Simple);
         self.word("!");
         if let Some(ident) = ident {

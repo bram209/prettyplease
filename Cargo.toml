@@ -1,34 +1,35 @@
 [package]
 name = "leptosfmt-prettyplease"
 version = "0.2.4"
-authors = ["David Tolnay <dtolnay@gmail.com>"]
+authors = [ "David Tolnay <dtolnay@gmail.com>" ]
 autoexamples = false
-categories = ["development-tools"]
+categories = [ "development-tools" ]
 description = "A fork of David Tolnay's prettyplease that adds the ability to format single expressions"
 documentation = "https://docs.rs/prettyplease"
 edition = "2021"
-exclude = ["cargo-expand"]
-keywords = ["rustfmt"]
+exclude = [ "cargo-expand" ]
+keywords = [ "rustfmt" ]
 license = "MIT OR Apache-2.0"
 links = "prettyplease01"
 repository = "https://github.com/bram209/prettyplease"
 rust-version = "1.56"
 
 [features]
-verbatim = ["syn/parsing"]
+verbatim = [ "syn/parsing" ]
 
 [dependencies]
 proc-macro2 = { version = "1.0", default-features = false }
-syn = { version = "2.0.10", default-features = false, features = ["full"] }
+syn = { version = "2.0.10", default-features = false, features = [ "full" ] }
+leptosfmt-pretty-printer = { version = "0.1.5" }
 
 [dev-dependencies]
-syn = { version = "2.0.10", default-features = false, features = ["parsing"] }
+syn = { version = "2.0.10", default-features = false, features = [ "parsing" ] }
 
 [lib]
 doc-scrape-examples = false
 
 [package.metadata.playground]
-features = ["verbatim"]
+features = [ "verbatim" ]
 
 [workspace]
-members = ["cargo-expand/update", "examples/update"]
+members = [ "cargo-expand/update", "examples/update" ]

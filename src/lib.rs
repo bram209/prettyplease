@@ -372,14 +372,14 @@ const INDENT: isize = 4;
 // Every line is allowed at least this much space, even if highly indented.
 const MIN_SPACE: isize = 60;
 
-pub fn unparse(file: &File) -> String {
-    let mut p = Printer::new();
+pub fn unparse(file: &File, printer: leptosfmt_pretty_printer::Printer) -> String {
+    let mut p = Printer::new(printer);
     p.file(file);
     p.eof()
 }
 
-pub fn unparse_expr(file: &Expr) -> String {
-    let mut p = Printer::new();
+pub fn unparse_expr(file: &Expr, printer: leptosfmt_pretty_printer::Printer) -> String {
+    let mut p = Printer::new(printer);
     p.expr(file);
     p.eof()
 }
