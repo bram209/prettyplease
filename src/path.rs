@@ -17,7 +17,7 @@ pub enum PathKind {
     Expr,
 }
 
-impl Printer {
+impl Printer<'_> {
     pub fn path(&mut self, path: &Path, kind: PathKind) {
         assert!(!path.segments.is_empty());
         for segment in path.segments.iter().delimited() {

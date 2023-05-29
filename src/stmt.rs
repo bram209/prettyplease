@@ -2,7 +2,7 @@ use crate::algorithm::Printer;
 use crate::INDENT;
 use syn::{BinOp, Expr, Stmt};
 
-impl Printer {
+impl Printer<'_> {
     pub fn stmt(&mut self, stmt: &Stmt) {
         match stmt {
             Stmt::Local(local) => {

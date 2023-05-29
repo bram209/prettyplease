@@ -1,11 +1,11 @@
+use crate::algorithm::Printer;
 use crate::path::PathKind;
 use crate::token::Token;
 use crate::INDENT;
-use crate::{algorithm::Printer};
 use proc_macro2::{Delimiter, Spacing, TokenStream};
 use syn::{Ident, Macro, MacroDelimiter};
 
-impl Printer {
+impl Printer<'_> {
     pub fn mac(&mut self, mac: &Macro, ident: Option<&Ident>, semicolon: bool) {
         if mac.path.is_ident("macro_rules") {
             if let Some(ident) = ident {

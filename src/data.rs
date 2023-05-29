@@ -4,7 +4,7 @@ use crate::path::PathKind;
 use crate::INDENT;
 use syn::{Field, Fields, FieldsUnnamed, Variant, VisRestricted, Visibility};
 
-impl Printer {
+impl Printer<'_> {
     pub fn variant(&mut self, variant: &Variant) {
         self.outer_attrs(&variant.attrs);
         self.ident(&variant.ident);

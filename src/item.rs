@@ -12,7 +12,7 @@ use syn::{
     TraitItemType, Type, UseGlob, UseGroup, UseName, UsePath, UseRename, UseTree, Variadic,
 };
 
-impl Printer {
+impl Printer<'_> {
     pub fn item(&mut self, item: &Item) {
         match item {
             Item::Const(item) => self.item_const(item),
@@ -1545,7 +1545,7 @@ mod verbatim {
         }
     }
 
-    impl Printer {
+    impl Printer<'_> {
         pub fn flexible_item_const(&mut self, item: &FlexibleItemConst) {
             self.outer_attrs(&item.attrs);
             self.cbox(0);

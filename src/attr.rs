@@ -4,7 +4,7 @@ use crate::INDENT;
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 use syn::{AttrStyle, Attribute, Expr, Lit, MacroDelimiter, Meta, MetaList, MetaNameValue};
 
-impl Printer {
+impl Printer<'_> {
     pub fn outer_attrs(&mut self, attrs: &[Attribute]) {
         for attr in attrs {
             if let AttrStyle::Outer = attr.style {

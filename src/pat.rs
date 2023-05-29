@@ -8,7 +8,7 @@ use syn::{
     PatTupleStruct, PatType, PatWild,
 };
 
-impl Printer {
+impl Printer<'_> {
     pub fn pat(&mut self, pat: &Pat) {
         match pat {
             Pat::Const(pat) => self.expr_const(pat),

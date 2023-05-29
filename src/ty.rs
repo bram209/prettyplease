@@ -9,7 +9,7 @@ use syn::{
     TypeSlice, TypeTraitObject, TypeTuple,
 };
 
-impl Printer {
+impl Printer<'_> {
     pub fn ty(&mut self, ty: &Type) {
         match ty {
             Type::Array(ty) => self.type_array(ty),

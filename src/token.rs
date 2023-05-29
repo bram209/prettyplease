@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use proc_macro2::{Delimiter, Ident, Literal, Spacing, TokenStream, TokenTree};
 
-impl Printer {
+impl Printer<'_> {
     pub fn single_token(&mut self, token: Token, group_contents: fn(&mut Self, TokenStream)) {
         match token {
             Token::Group(delimiter, stream) => self.token_group(delimiter, stream, group_contents),

@@ -10,7 +10,7 @@ use syn::{
     WherePredicate,
 };
 
-impl Printer {
+impl Printer<'_> {
     pub fn generics(&mut self, generics: &Generics) {
         if generics.params.is_empty() {
             return;

@@ -1,5 +1,5 @@
 use leptosfmt_pretty_printer::{BeginToken, BreakToken};
-use std::borrow::Cow;
+use std::{borrow::Cow, ops::Deref};
 use syn::Macro;
 
 pub trait MacroFormatter {
@@ -7,21 +7,17 @@ pub trait MacroFormatter {
     fn format(&self, printer: &mut leptosfmt_pretty_printer::Printer, mac: &Macro);
 }
 
-pub struct Printer {
-    pub inner: leptosfmt_pretty_printer::Printer,
+pub struct Printer<'a> {
+    pub inner: &'a mut leptosfmt_pretty_printer::Printer,
     pub macro_formatter: Option<Box<dyn MacroFormatter>>,
 }
 
-impl Printer {
-    pub fn new(printer: leptosfmt_pretty_printer::Printer) -> Self {
+impl<'a> Printer<'a> {
+    pub fn new(printer: &'a mut leptosfmt_pretty_printer::Printer) -> Self {
         Self {
             inner: printer,
             macro_formatter: None,
         }
-    }
-
-    pub fn eof(self) -> String {
-        self.inner.eof()
     }
 
     pub fn scan_begin(&mut self, token: BeginToken) {

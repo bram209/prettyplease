@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use syn::File;
 
-impl Printer {
+impl Printer<'_> {
     pub fn file(&mut self, file: &File) {
         self.cbox(0);
         if let Some(shebang) = &file.shebang {

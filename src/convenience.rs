@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use crate::algorithm::Printer;
 
-impl Printer {
+impl Printer<'_> {
     pub fn ibox(&mut self, indent: isize) {
         self.inner.ibox(indent)
     }

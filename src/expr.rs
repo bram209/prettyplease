@@ -17,7 +17,7 @@ use syn::{
     UnOp,
 };
 
-impl Printer {
+impl Printer<'_> {
     pub fn expr(&mut self, expr: &Expr) {
         match expr {
             Expr::Array(expr) => self.expr_array(expr),

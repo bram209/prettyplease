@@ -2,7 +2,7 @@ use crate::algorithm::Printer;
 use proc_macro2::Literal;
 use syn::{Lit, LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitInt, LitStr};
 
-impl Printer {
+impl Printer<'_> {
     pub fn lit(&mut self, lit: &Lit) {
         match lit {
             Lit::Str(lit) => self.lit_str(lit),
