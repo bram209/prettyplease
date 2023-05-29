@@ -360,7 +360,8 @@ mod stmt;
 mod token;
 mod ty;
 
-use crate::algorithm::{MacroFormatter, Printer};
+pub use crate::algorithm::MacroFormatter;
+use crate::algorithm::Printer;
 use syn::{Expr, File};
 
 // Target line width.
