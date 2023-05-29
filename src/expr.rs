@@ -478,7 +478,8 @@ impl Printer {
 
     pub fn expr_macro(&mut self, expr: &ExprMacro) {
         self.outer_attrs(&expr.attrs);
-        self.mac(&expr.mac, None);
+        let semicolon = false;
+        self.mac(&expr.mac, None, semicolon);
     }
 
     fn expr_match(&mut self, expr: &ExprMatch) {
@@ -666,10 +667,17 @@ impl Printer {
     #[cfg(feature = "verbatim")]
     fn expr_verbatim(&mut self, tokens: &TokenStream) {
         use syn::parse::{Parse, ParseStream, Result};
+        use syn::{parenthesized, Ident};
 
         enum ExprVerbatim {
             Empty,
+            Builtin(Builtin),
             RawReference(RawReference),
+        }
+
+        struct Builtin {
+            name: Ident,
+            args: TokenStream,
         }
 
         struct RawReference {
@@ -678,6 +686,7 @@ impl Printer {
         }
 
         mod kw {
+            syn::custom_keyword!(builtin);
             syn::custom_keyword!(raw);
         }
 
@@ -686,6 +695,14 @@ impl Printer {
                 let lookahead = input.lookahead1();
                 if input.is_empty() {
                     Ok(ExprVerbatim::Empty)
+                } else if lookahead.peek(kw::builtin) {
+                    input.parse::<kw::builtin>()?;
+                    input.parse::<Token![#]>()?;
+                    let name: Ident = input.parse()?;
+                    let args;
+                    parenthesized!(args in input);
+                    let args: TokenStream = args.parse()?;
+                    Ok(ExprVerbatim::Builtin(Builtin { name, args }))
                 } else if lookahead.peek(Token![&]) {
                     input.parse::<Token![&]>()?;
                     input.parse::<kw::raw>()?;
@@ -708,6 +725,22 @@ impl Printer {
 
         match expr {
             ExprVerbatim::Empty => {}
+            ExprVerbatim::Builtin(expr) => {
+                self.word("builtin # ");
+                self.ident(&expr.name);
+                self.word("(");
+                if !expr.args.is_empty() {
+                    self.cbox(INDENT);
+                    self.zerobreak();
+                    self.ibox(0);
+                    self.macro_rules_tokens(expr.args, false);
+                    self.end();
+                    self.zerobreak();
+                    self.offset(-INDENT);
+                    self.end();
+                }
+                self.word(")");
+            }
             ExprVerbatim::RawReference(expr) => {
                 self.word("&raw ");
                 self.word(if expr.mutable { "mut " } else { "const " });

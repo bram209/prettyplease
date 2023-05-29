@@ -1,6 +1,6 @@
 [package]
 name = "leptosfmt-prettyplease"
-version = "0.2.4"
+version = "0.2.6"
 authors = [ "David Tolnay <dtolnay@gmail.com>" ]
 autoexamples = false
 categories = [ "development-tools" ]
@@ -19,11 +19,11 @@ verbatim = [ "syn/parsing" ]
 
 [dependencies]
 proc-macro2 = { version = "1.0", default-features = false }
-syn = { version = "2.0.10", default-features = false, features = [ "full" ] }
+syn = { version = "2.0.16", default-features = false, features = [ "full" ] }
 leptosfmt-pretty-printer = { version = "0.1.5" }
 
 [dev-dependencies]
-syn = { version = "2.0.10", default-features = false, features = [ "parsing" ] }
+syn = { version = "2.0.16", default-features = false, features = [ "parsing" ] }
 
 [lib]
 doc-scrape-examples = false
