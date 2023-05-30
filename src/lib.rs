@@ -376,7 +376,7 @@ const MIN_SPACE: isize = 60;
 pub fn unparse(
     file: &File,
     printer: &mut leptosfmt_pretty_printer::Printer,
-    macro_formatter: Option<Box<dyn MacroFormatter>>,
+    macro_formatter: Option<&dyn MacroFormatter>,
 ) {
     let mut p = Printer::new(printer, macro_formatter);
     p.file(file);
@@ -385,7 +385,7 @@ pub fn unparse(
 pub fn unparse_expr(
     file: &Expr,
     printer: &mut leptosfmt_pretty_printer::Printer,
-    macro_formatter: Option<Box<dyn MacroFormatter>>,
+    macro_formatter: Option<&dyn MacroFormatter>,
 ) {
     let mut p = Printer::new(printer, macro_formatter);
     p.expr(file);

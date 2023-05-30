@@ -9,13 +9,13 @@ pub trait MacroFormatter {
 
 pub struct Printer<'a> {
     pub inner: &'a mut leptosfmt_pretty_printer::Printer,
-    pub macro_formatter: Option<Box<dyn MacroFormatter>>,
+    pub macro_formatter: Option<&'a dyn MacroFormatter>,
 }
 
 impl<'a> Printer<'a> {
     pub fn new(
         printer: &'a mut leptosfmt_pretty_printer::Printer,
-        macro_formatter: Option<Box<dyn MacroFormatter>>,
+        macro_formatter: Option<&'a dyn MacroFormatter>,
     ) -> Self {
         Self {
             inner: printer,
