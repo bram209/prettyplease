@@ -1,5 +1,5 @@
 use leptosfmt_pretty_printer::{BeginToken, BreakToken};
-use std::{borrow::Cow, ops::Deref};
+use std::borrow::Cow;
 use syn::Macro;
 
 pub trait MacroFormatter {

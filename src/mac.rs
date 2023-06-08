@@ -25,7 +25,7 @@ impl Printer<'_> {
 
         if let Some(macro_formatter) = &self.macro_formatter {
             if macro_formatter.accept(mac) {
-                macro_formatter.format(&mut self.inner, mac);
+                macro_formatter.format(self.inner, mac);
                 return;
             }
         }
