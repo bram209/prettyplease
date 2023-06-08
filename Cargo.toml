@@ -20,7 +20,7 @@ verbatim = [ "syn/parsing" ]
 [dependencies]
 proc-macro2 = { version = "1.0", default-features = false }
 syn = { version = "2.0.18", default-features = false, features = [ "full" ] }
-leptosfmt-pretty-printer = { version = "0.1.5" }
+leptosfmt-pretty-printer = { version = "0.1.6" }
 
 [dev-dependencies]
 syn = { version = "2.0.16", default-features = false, features = [ "parsing" ] }
