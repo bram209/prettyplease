@@ -3,8 +3,7 @@ use std::borrow::Cow;
 use syn::Macro;
 
 pub trait MacroFormatter {
-    fn accept(&self, mac: &Macro) -> bool;
-    fn format(&self, printer: &mut leptosfmt_pretty_printer::Printer, mac: &Macro);
+    fn format(&self, printer: &mut leptosfmt_pretty_printer::Printer, mac: &Macro) -> bool;
 }
 
 pub struct Printer<'a> {
