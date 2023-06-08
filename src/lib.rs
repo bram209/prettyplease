@@ -355,7 +355,6 @@ mod lit;
 mod mac;
 mod pat;
 mod path;
-mod ring;
 mod stmt;
 mod token;
 mod ty;
