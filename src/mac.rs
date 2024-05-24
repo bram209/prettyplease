@@ -3,7 +3,7 @@ use crate::path::PathKind;
 use crate::token::Token;
 use crate::INDENT;
 use proc_macro2::{Delimiter, Spacing, TokenStream};
-use syn::{Ident, Macro, MacroDelimiter};
+use syn::{spanned::Spanned, Ident, Macro, MacroDelimiter};
 
 impl Printer<'_> {
     pub fn mac(&mut self, mac: &Macro, ident: Option<&Ident>, semicolon: bool) {
@@ -50,7 +50,13 @@ impl Printer<'_> {
             self.cbox(INDENT);
             delimiter_break(self);
             self.ibox(0);
-            self.macro_rules_tokens(mac.tokens.clone(), false);
+
+            if let Some(source_text) = mac.tokens.span().source_text() {
+                self.word(source_text);
+            } else {
+                self.macro_rules_tokens(mac.tokens.clone(), false);
+            }
+
             self.end();
             delimiter_break(self);
             self.offset(-INDENT);
