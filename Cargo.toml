@@ -1,35 +1,39 @@
 [package]
 name = "leptosfmt-prettyplease"
-version = "0.2.11"
-authors = [ "David Tolnay <dtolnay@gmail.com>" ]
+version = "0.2.20"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
 autoexamples = false
-categories = [ "development-tools" ]
+categories = ["development-tools"]
 description = "A fork of David Tolnay's prettyplease that adds the ability to format single expressions"
 documentation = "https://docs.rs/prettyplease"
 edition = "2021"
-exclude = [ "cargo-expand" ]
-keywords = [ "rustfmt" ]
+exclude = ["cargo-expand"]
+keywords = ["rustfmt"]
 license = "MIT OR Apache-2.0"
-links = "prettyplease01"
+links = "prettyplease02"
 repository = "https://github.com/bram209/prettyplease"
-rust-version = "1.56"
+rust-version = "1.60"
 
 [features]
-verbatim = [ "syn/parsing" ]
+verbatim = ["syn/parsing"]
 
 [dependencies]
-proc-macro2 = { version = "1.0", default-features = false }
-syn = { version = "2.0.18", default-features = false, features = [ "full" ] }
+proc-macro2 = { version = "1.0.80", default-features = false }
+syn = { version = "2.0.59", default-features = false, features = ["full"] }
 leptosfmt-pretty-printer = { version = "0.1.6" }
 
 [dev-dependencies]
-syn = { version = "2.0.16", default-features = false, features = [ "parsing" ] }
+indoc = "2"
+proc-macro2 = { version = "1.0.80", default-features = false }
+quote = { version = "1.0.35", default-features = false }
+syn = { version = "2.0.59", default-features = false, features = ["parsing"] }
 
 [lib]
 doc-scrape-examples = false
 
-[package.metadata.playground]
-features = [ "verbatim" ]
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+rustdoc-args = ["--generate-link-to-definition"]
 
-[workspace]
-members = [ "cargo-expand/update", "examples/update" ]
+[package.metadata.playground]
+features = ["verbatim"]
