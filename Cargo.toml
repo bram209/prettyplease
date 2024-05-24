@@ -18,8 +18,8 @@ rust-version = "1.60"
 verbatim = ["syn/parsing"]
 
 [dependencies]
-proc-macro2 = { version = "1.0.80", default-features = false }
-syn = { version = "2.0.59", default-features = false, features = ["full"] }
+proc-macro2 = { workspace = true }
+syn = { workspace = true }
 leptosfmt-pretty-printer = { workspace = true }
 
 [dev-dependencies]
