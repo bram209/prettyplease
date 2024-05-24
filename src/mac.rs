@@ -521,7 +521,7 @@ mod standard_library {
         }
     }
 
-    impl Printer {
+    impl Printer<'_> {
         pub fn standard_library_macro(&mut self, mac: &Macro, mut semicolon: bool) -> bool {
             let name = mac.path.segments.last().unwrap().ident.to_string();
             let parser = match name.as_str() {

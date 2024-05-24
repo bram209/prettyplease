@@ -20,7 +20,7 @@ verbatim = ["syn/parsing"]
 [dependencies]
 proc-macro2 = { version = "1.0.80", default-features = false }
 syn = { version = "2.0.59", default-features = false, features = ["full"] }
-leptosfmt-pretty-printer = { version = "0.1.6" }
+leptosfmt-pretty-printer = { workspace = true }
 
 [dev-dependencies]
 indoc = "2"
