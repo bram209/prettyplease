@@ -346,7 +346,8 @@
     clippy::similar_names,
     clippy::too_many_lines,
     clippy::unused_self,
-    clippy::vec_init_then_push
+    clippy::vec_init_then_push,
+    dead_code
 )]
 #![cfg_attr(all(test, exhaustive), feature(non_exhaustive_omitted_patterns_lint))]
 
