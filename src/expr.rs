@@ -686,8 +686,14 @@ impl Printer<'_> {
         enum ExprVerbatim {
             Empty,
             Ellipsis,
+            Become(Become),
             Builtin(Builtin),
             RawReference(RawReference),
+        }
+
+        struct Become {
+            attrs: Vec<Attribute>,
+            tail_call: Expr,
         }
 
         struct Builtin {
@@ -714,6 +720,11 @@ impl Printer<'_> {
                 let lookahead = ahead.lookahead1();
                 if input.is_empty() {
                     Ok(ExprVerbatim::Empty)
+                } else if lookahead.peek(Token![become]) {
+                    input.advance_to(&ahead);
+                    input.parse::<Token![become]>()?;
+                    let tail_call: Expr = input.parse()?;
+                    Ok(ExprVerbatim::Become(Become { attrs, tail_call }))
                 } else if lookahead.peek(kw::builtin) {
                     input.advance_to(&ahead);
                     input.parse::<kw::builtin>()?;
@@ -755,6 +766,12 @@ impl Printer<'_> {
             ExprVerbatim::Empty => {}
             ExprVerbatim::Ellipsis => {
                 self.word("...");
+            }
+            ExprVerbatim::Become(expr) => {
+                self.outer_attrs(&expr.attrs);
+                self.word("become");
+                self.nbsp();
+                self.expr(&expr.tail_call);
             }
             ExprVerbatim::Builtin(expr) => {
                 self.outer_attrs(&expr.attrs);
