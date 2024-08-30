@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use proc_macro2::TokenStream;
 use std::ptr;
 use syn::{
@@ -43,7 +43,7 @@ impl Printer<'_> {
             }
         }
 
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(">");
     }
@@ -83,7 +83,7 @@ impl Printer<'_> {
     fn type_param(&mut self, type_param: &TypeParam) {
         self.outer_attrs(&type_param.attrs);
         self.ident(&type_param.ident);
-        self.ibox(INDENT);
+        self.ibox(self.indent());
         for type_param_bound in type_param.bounds.iter().delimited() {
             if type_param_bound.is_first {
                 self.word(": ");
@@ -253,7 +253,7 @@ impl Printer<'_> {
         };
         if hardbreaks {
             self.hardbreak();
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.word("where");
             self.hardbreak();
             for predicate in where_clause.predicates.iter().delimited() {
@@ -266,11 +266,11 @@ impl Printer<'_> {
                 }
             }
             if !semi {
-                self.offset(-INDENT);
+                self.offset(-self.indent());
             }
         } else {
             self.space();
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.word("where");
             self.space();
             for predicate in where_clause.predicates.iter().delimited() {
@@ -282,7 +282,7 @@ impl Printer<'_> {
                 }
             }
             if !semi {
-                self.offset(-INDENT);
+                self.offset(-self.indent());
             }
         }
     }
@@ -305,7 +305,7 @@ impl Printer<'_> {
         if predicate.bounds.len() == 1 {
             self.ibox(0);
         } else {
-            self.ibox(INDENT);
+            self.ibox(self.indent());
         }
         for type_param_bound in predicate.bounds.iter().delimited() {
             if type_param_bound.is_first {
@@ -322,7 +322,7 @@ impl Printer<'_> {
     fn predicate_lifetime(&mut self, predicate: &PredicateLifetime) {
         self.lifetime(&predicate.lifetime);
         self.word(":");
-        self.ibox(INDENT);
+        self.ibox(self.indent());
         for lifetime in predicate.bounds.iter().delimited() {
             if lifetime.is_first {
                 self.nbsp();

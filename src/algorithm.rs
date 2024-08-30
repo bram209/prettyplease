@@ -22,6 +22,14 @@ impl<'a> Printer<'a> {
         }
     }
 
+    pub fn settings(&self) -> &leptosfmt_pretty_printer::PrinterSettings {
+        &self.inner.settings
+    }
+
+    pub fn indent(&self) -> isize {
+        self.inner.settings.tab_spaces
+    }
+
     pub fn scan_begin(&mut self, token: BeginToken) {
         self.inner.scan_begin(token);
     }

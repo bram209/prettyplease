@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use syn::{Field, Fields, FieldsUnnamed, Variant, VisRestricted, Visibility};
 
 impl Printer<'_> {
@@ -12,18 +12,18 @@ impl Printer<'_> {
             Fields::Named(fields) => {
                 self.nbsp();
                 self.word("{");
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.space();
                 for field in fields.named.iter().delimited() {
                     self.field(&field);
                     self.trailing_comma_or_space(field.is_last);
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
             }
             Fields::Unnamed(fields) => {
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.fields_unnamed(fields);
                 self.end();
             }
@@ -42,7 +42,7 @@ impl Printer<'_> {
             self.field(&field);
             self.trailing_comma(field.is_last);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.word(")");
     }
 

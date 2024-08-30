@@ -1,6 +1,6 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
-use crate::INDENT;
+
 use std::ptr;
 use syn::{
     AngleBracketedGenericArguments, AssocConst, AssocType, Constraint, Expr, GenericArgument,
@@ -84,7 +84,7 @@ impl Printer<'_> {
             self.word("::");
         }
         self.word("<");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
 
         // Print lifetimes before types/consts/bindings, regardless of their
@@ -116,7 +116,7 @@ impl Printer<'_> {
             }
         }
 
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(">");
     }
@@ -144,7 +144,7 @@ impl Printer<'_> {
         if let Some(generics) = &constraint.generics {
             self.angle_bracketed_generic_arguments(generics, PathKind::Type);
         }
-        self.ibox(INDENT);
+        self.ibox(self.indent());
         for bound in constraint.bounds.iter().delimited() {
             if bound.is_first {
                 self.word(": ");
@@ -158,14 +158,14 @@ impl Printer<'_> {
     }
 
     fn parenthesized_generic_arguments(&mut self, arguments: &ParenthesizedGenericArguments) {
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.word("(");
         self.zerobreak();
         for ty in arguments.inputs.iter().delimited() {
             self.ty(&ty);
             self.trailing_comma(ty.is_last);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.word(")");
         self.return_type(&arguments.output);
         self.end();

@@ -7,8 +7,32 @@ impl Printer<'_> {
         self.inner.ibox(indent)
     }
 
+    pub fn ibox_indent(&mut self) {
+        self.inner.ibox_indent()
+    }
+
+    pub fn ibox_dedent(&mut self) {
+        self.inner.ibox_dedent()
+    }
+
     pub fn cbox(&mut self, indent: isize) {
         self.inner.cbox(indent)
+    }
+
+    pub fn cbox_indent(&mut self) {
+        self.inner.cbox_indent()
+    }
+
+    pub fn cbox_dedent(&mut self) {
+        self.inner.cbox_dedent()
+    }
+
+    pub fn offset_indent(&mut self) {
+        self.inner.offset(self.settings().tab_spaces)
+    }
+
+    pub fn offset_dedent(&mut self) {
+        self.inner.offset(-self.settings().tab_spaces)
     }
 
     pub fn end(&mut self) {

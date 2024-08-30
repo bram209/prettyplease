@@ -3,7 +3,7 @@ use crate::attr;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
 use crate::stmt;
-use crate::INDENT;
+
 use leptosfmt_pretty_printer::BreakToken;
 use proc_macro2::TokenStream;
 use syn::punctuated::Punctuated;
@@ -88,7 +88,7 @@ impl Printer<'_> {
             }
             Expr::Try(expr) => self.subexpr_try(expr, beginning_of_line),
             _ => {
-                self.cbox(-INDENT);
+                self.cbox(-self.indent());
                 self.expr(expr);
                 self.end();
             }
@@ -116,13 +116,13 @@ impl Printer<'_> {
     fn expr_array(&mut self, expr: &ExprArray) {
         self.outer_attrs(&expr.attrs);
         self.word("[");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for element in expr.elems.iter().delimited() {
             self.expr(&element);
             self.trailing_comma(element.is_last);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("]");
     }
@@ -143,14 +143,14 @@ impl Printer<'_> {
         if expr.capture.is_some() {
             self.word("move ");
         }
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.small_block(&expr.block, &expr.attrs);
         self.end();
     }
 
     fn expr_await(&mut self, expr: &ExprAwait, beginning_of_line: bool) {
         self.outer_attrs(&expr.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.subexpr_await(expr, beginning_of_line);
         self.end();
     }
@@ -163,8 +163,8 @@ impl Printer<'_> {
 
     fn expr_binary(&mut self, expr: &ExprBinary) {
         self.outer_attrs(&expr.attrs);
-        self.ibox(INDENT);
-        self.ibox(-INDENT);
+        self.ibox(self.indent());
+        self.ibox(-self.indent());
         self.expr(&expr.left);
         self.end();
         self.space();
@@ -179,7 +179,7 @@ impl Printer<'_> {
         if let Some(label) = &expr.label {
             self.label(label);
         }
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.small_block(&expr.block, &expr.attrs);
         self.end();
     }
@@ -215,8 +215,8 @@ impl Printer<'_> {
 
     fn expr_cast(&mut self, expr: &ExprCast) {
         self.outer_attrs(&expr.attrs);
-        self.ibox(INDENT);
-        self.ibox(-INDENT);
+        self.ibox(self.indent());
+        self.ibox(-self.indent());
         self.expr(&expr.expr);
         self.end();
         self.space();
@@ -243,7 +243,7 @@ impl Printer<'_> {
         if expr.capture.is_some() {
             self.word("move ");
         }
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.word("|");
         for pat in expr.inputs.iter().delimited() {
             if pat.is_first {
@@ -259,7 +259,7 @@ impl Printer<'_> {
             ReturnType::Default => {
                 self.word("|");
                 self.space();
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.neverbreak();
                 let wrap_in_brace = match &*expr.body {
@@ -269,7 +269,7 @@ impl Printer<'_> {
                     body => !is_blocklike(body),
                 };
                 if wrap_in_brace {
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     let okay_to_brace = parseable_as_stmt(&expr.body);
                     self.scan_break(BreakToken {
                         pre_break: Some(if okay_to_brace { '{' } else { '(' }),
@@ -277,7 +277,7 @@ impl Printer<'_> {
                     });
                     self.expr(&expr.body);
                     self.scan_break(BreakToken {
-                        offset: -INDENT,
+                        offset: -self.indent(),
                         pre_break: (okay_to_brace && stmt::add_semi(&expr.body)).then(|| ';'),
                         post_break: Some(if okay_to_brace { '}' } else { ')' }),
                         ..BreakToken::default()
@@ -290,7 +290,7 @@ impl Printer<'_> {
             ReturnType::Type(_arrow, ty) => {
                 if !expr.inputs.is_empty() {
                     self.trailing_comma(true);
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                 }
                 self.word("|");
                 self.end();
@@ -307,7 +307,7 @@ impl Printer<'_> {
     pub fn expr_const(&mut self, expr: &ExprConst) {
         self.outer_attrs(&expr.attrs);
         self.word("const ");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.small_block(&expr.block, &expr.attrs);
         self.end();
     }
@@ -323,7 +323,7 @@ impl Printer<'_> {
 
     fn expr_field(&mut self, expr: &ExprField, beginning_of_line: bool) {
         self.outer_attrs(&expr.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.subexpr_field(expr, beginning_of_line);
         self.end();
     }
@@ -348,13 +348,13 @@ impl Printer<'_> {
         self.wrap_exterior_struct(&expr.expr);
         self.word("{");
         self.neverbreak();
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.hardbreak_if_nonempty();
         self.inner_attrs(&expr.attrs);
         for stmt in &expr.body.stmts {
             self.stmt(stmt);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.end();
@@ -367,9 +367,9 @@ impl Printer<'_> {
 
     fn expr_if(&mut self, expr: &ExprIf) {
         self.outer_attrs(&expr.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.word("if ");
-        self.cbox(-INDENT);
+        self.cbox(-self.indent());
         self.wrap_exterior_struct(&expr.cond);
         self.end();
         if let Some((_else_token, else_branch)) = &expr.else_branch {
@@ -380,7 +380,7 @@ impl Printer<'_> {
                 match else_branch {
                     Expr::If(expr) => {
                         self.word("if ");
-                        self.cbox(-INDENT);
+                        self.cbox(-self.indent());
                         self.wrap_exterior_struct(&expr.cond);
                         self.end();
                         self.small_block(&expr.then_branch, &[]);
@@ -397,11 +397,11 @@ impl Printer<'_> {
                     other => {
                         self.word("{");
                         self.space();
-                        self.ibox(INDENT);
+                        self.ibox(self.indent());
                         self.expr(other);
                         self.end();
                         self.space();
-                        self.offset(-INDENT);
+                        self.offset(-self.indent());
                         self.word("}");
                     }
                 }
@@ -415,7 +415,7 @@ impl Printer<'_> {
             for stmt in &expr.then_branch.stmts {
                 self.stmt(stmt);
             }
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.word("}");
         }
         self.end();
@@ -474,13 +474,13 @@ impl Printer<'_> {
             self.label(label);
         }
         self.word("loop {");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.hardbreak_if_nonempty();
         self.inner_attrs(&expr.attrs);
         for stmt in &expr.body.stmts {
             self.stmt(stmt);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
     }
@@ -498,14 +498,14 @@ impl Printer<'_> {
         self.wrap_exterior_struct(&expr.expr);
         self.word("{");
         self.neverbreak();
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.hardbreak_if_nonempty();
         self.inner_attrs(&expr.attrs);
         for arm in &expr.arms {
             self.arm(arm);
             self.hardbreak();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.end();
@@ -513,8 +513,8 @@ impl Printer<'_> {
 
     fn expr_method_call(&mut self, expr: &ExprMethodCall, beginning_of_line: bool) {
         self.outer_attrs(&expr.attrs);
-        self.cbox(INDENT);
-        let unindent_call_args = beginning_of_line && is_short_ident(&expr.receiver);
+        self.cbox(self.indent());
+        let unindent_call_args = beginning_of_line && is_short_ident(&expr.receiver, self.indent());
         self.subexpr_method_call(expr, beginning_of_line, unindent_call_args);
         self.end();
     }
@@ -532,7 +532,11 @@ impl Printer<'_> {
         if let Some(turbofish) = &expr.turbofish {
             self.angle_bracketed_generic_arguments(turbofish, PathKind::Expr);
         }
-        self.cbox(if unindent_call_args { -INDENT } else { 0 });
+        self.cbox(if unindent_call_args {
+            -self.indent()
+        } else {
+            0
+        });
         self.word("(");
         self.call_args(&expr.args);
         self.word(")");
@@ -594,8 +598,8 @@ impl Printer<'_> {
 
     fn expr_struct(&mut self, expr: &ExprStruct) {
         self.outer_attrs(&expr.attrs);
-        self.cbox(INDENT);
-        self.ibox(-INDENT);
+        self.cbox(self.indent());
+        self.ibox(-self.indent());
         self.qpath(&expr.qself, &expr.path, PathKind::Expr);
         self.end();
         self.word(" {");
@@ -609,7 +613,7 @@ impl Printer<'_> {
             self.expr(rest);
             self.space();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end_with_max_width(34);
         self.word("}");
     }
@@ -628,7 +632,7 @@ impl Printer<'_> {
     fn expr_try_block(&mut self, expr: &ExprTryBlock) {
         self.outer_attrs(&expr.attrs);
         self.word("try ");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.small_block(&expr.block, &expr.attrs);
         self.end();
     }
@@ -636,7 +640,7 @@ impl Printer<'_> {
     fn expr_tuple(&mut self, expr: &ExprTuple) {
         self.outer_attrs(&expr.attrs);
         self.word("(");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for elem in expr.elems.iter().delimited() {
             self.expr(&elem);
@@ -647,7 +651,7 @@ impl Printer<'_> {
                 self.trailing_comma(elem.is_last);
             }
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
     }
@@ -661,7 +665,7 @@ impl Printer<'_> {
     fn expr_unsafe(&mut self, expr: &ExprUnsafe) {
         self.outer_attrs(&expr.attrs);
         self.word("unsafe ");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.small_block(&expr.block, &expr.attrs);
         self.end();
     }
@@ -758,13 +762,13 @@ impl Printer<'_> {
                 self.ident(&expr.name);
                 self.word("(");
                 if !expr.args.is_empty() {
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     self.ibox(0);
                     self.macro_rules_tokens(expr.args, false);
                     self.end();
                     self.zerobreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                 }
                 self.word(")");
@@ -787,13 +791,13 @@ impl Printer<'_> {
         self.wrap_exterior_struct(&expr.cond);
         self.word("{");
         self.neverbreak();
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.hardbreak_if_nonempty();
         self.inner_attrs(&expr.attrs);
         for stmt in &expr.body.stmts {
             self.stmt(stmt);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
     }
@@ -864,27 +868,27 @@ impl Printer<'_> {
             }
             self.word("{");
             self.neverbreak();
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.hardbreak_if_nonempty();
             self.inner_attrs(&body.attrs);
             for stmt in &body.block.stmts {
                 self.stmt(stmt);
             }
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.end();
             self.word("}");
             self.end();
         } else {
             self.nbsp();
             self.neverbreak();
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.scan_break(BreakToken {
                 pre_break: Some('{'),
                 ..BreakToken::default()
             });
             self.expr_beginning_of_line(body, true);
             self.scan_break(BreakToken {
-                offset: -INDENT,
+                offset: -self.indent(),
                 pre_break: stmt::add_semi(body).then(|| ';'),
                 post_break: Some('}'),
                 no_break: requires_terminator(body).then(|| ','),
@@ -902,13 +906,13 @@ impl Printer<'_> {
                 self.expr(expr);
             }
             _ => {
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.zerobreak();
                 for arg in args.iter().delimited() {
                     self.expr(&arg);
                     self.trailing_comma(arg.is_last);
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
             }
         }
@@ -932,7 +936,7 @@ impl Printer<'_> {
                     }
                 }
             }
-            self.offset(-INDENT);
+            self.offset(-self.indent());
         }
         self.word("}");
     }
@@ -998,7 +1002,7 @@ impl Printer<'_> {
     }
 
     fn zerobreak_unless_short_ident(&mut self, beginning_of_line: bool, expr: &Expr) {
-        if beginning_of_line && is_short_ident(expr) {
+        if beginning_of_line && is_short_ident(expr, self.indent()) {
             return;
         }
         self.zerobreak();
@@ -1166,14 +1170,14 @@ fn needs_newline_if_wrap(expr: &Expr) -> bool {
     }
 }
 
-fn is_short_ident(expr: &Expr) -> bool {
+fn is_short_ident(expr: &Expr, indent: isize) -> bool {
     if let Expr::Path(expr) = expr {
         return expr.attrs.is_empty()
             && expr.qself.is_none()
             && expr
                 .path
                 .get_ident()
-                .map_or(false, |ident| ident.to_string().len() as isize <= INDENT);
+                .map_or(false, |ident| ident.to_string().len() as isize <= indent);
     }
     false
 }

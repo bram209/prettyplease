@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use proc_macro2::TokenStream;
 use syn::{
     FieldPat, Pat, PatIdent, PatOr, PatParen, PatReference, PatRest, PatSlice, PatStruct, PatTuple,
@@ -108,7 +108,7 @@ impl Printer<'_> {
 
     fn pat_struct(&mut self, pat: &PatStruct) {
         self.outer_attrs(&pat.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.path(&pat.path, PathKind::Expr);
         self.word(" {");
         self.space_if_nonempty();
@@ -120,7 +120,7 @@ impl Printer<'_> {
             self.pat_rest(rest);
             self.space();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
     }
@@ -128,7 +128,7 @@ impl Printer<'_> {
     fn pat_tuple(&mut self, pat: &PatTuple) {
         self.outer_attrs(&pat.attrs);
         self.word("(");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for elem in pat.elems.iter().delimited() {
             self.pat(&elem);
@@ -141,7 +141,7 @@ impl Printer<'_> {
                 self.trailing_comma(elem.is_last);
             }
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
     }
@@ -150,13 +150,13 @@ impl Printer<'_> {
         self.outer_attrs(&pat.attrs);
         self.path(&pat.path, PathKind::Expr);
         self.word("(");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for elem in pat.elems.iter().delimited() {
             self.pat(&elem);
             self.trailing_comma(elem.is_last);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
     }
@@ -230,7 +230,7 @@ impl Printer<'_> {
             }
             PatVerbatim::Const(pat) => {
                 self.word("const ");
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.small_block(&pat.block, &pat.attrs);
                 self.end();
             }

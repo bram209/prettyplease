@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use proc_macro2::TokenStream;
 use syn::{
     Fields, FnArg, ForeignItem, ForeignItemFn, ForeignItemMacro, ForeignItemStatic,
@@ -55,7 +55,7 @@ impl Printer<'_> {
 
     fn item_enum(&mut self, item: &ItemEnum) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.word("enum ");
         self.ident(&item.ident);
@@ -68,7 +68,7 @@ impl Printer<'_> {
             self.word(",");
             self.hardbreak();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -89,7 +89,7 @@ impl Printer<'_> {
 
     fn item_fn(&mut self, item: &ItemFn) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.signature(&item.sig);
         self.where_clause_for_body(&item.sig.generics.where_clause);
@@ -99,7 +99,7 @@ impl Printer<'_> {
         for stmt in &item.block.stmts {
             self.stmt(stmt);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -107,7 +107,7 @@ impl Printer<'_> {
 
     fn item_foreign_mod(&mut self, item: &ItemForeignMod) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         if item.unsafety.is_some() {
             self.word("unsafe ");
         }
@@ -118,7 +118,7 @@ impl Printer<'_> {
         for foreign_item in &item.items {
             self.foreign_item(foreign_item);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -126,9 +126,9 @@ impl Printer<'_> {
 
     fn item_impl(&mut self, item: &ItemImpl) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
-        self.ibox(-INDENT);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
+        self.ibox(-self.indent());
+        self.cbox(self.indent());
         if item.defaultness.is_some() {
             self.word("default ");
         }
@@ -156,7 +156,7 @@ impl Printer<'_> {
         for impl_item in &item.items {
             self.impl_item(impl_item);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -171,7 +171,7 @@ impl Printer<'_> {
 
     fn item_mod(&mut self, item: &ItemMod) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         if item.unsafety.is_some() {
             self.word("unsafe ");
@@ -185,7 +185,7 @@ impl Printer<'_> {
             for item in items {
                 self.item(item);
             }
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.end();
             self.word("}");
         } else {
@@ -214,7 +214,7 @@ impl Printer<'_> {
 
     fn item_struct(&mut self, item: &ItemStruct) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.word("struct ");
         self.ident(&item.ident);
@@ -229,7 +229,7 @@ impl Printer<'_> {
                     self.word(",");
                     self.hardbreak();
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
             }
@@ -248,7 +248,7 @@ impl Printer<'_> {
 
     fn item_trait(&mut self, item: &ItemTrait) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         if item.unsafety.is_some() {
             self.word("unsafe ");
@@ -274,7 +274,7 @@ impl Printer<'_> {
         for trait_item in &item.items {
             self.trait_item(trait_item);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -282,7 +282,7 @@ impl Printer<'_> {
 
     fn item_trait_alias(&mut self, item: &ItemTraitAlias) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.word("trait ");
         self.ident(&item.ident);
@@ -303,7 +303,7 @@ impl Printer<'_> {
 
     fn item_type(&mut self, item: &ItemType) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.word("type ");
         self.ident(&item.ident);
@@ -311,7 +311,7 @@ impl Printer<'_> {
         self.where_clause_oneline(&item.generics.where_clause);
         self.word("= ");
         self.neverbreak();
-        self.ibox(-INDENT);
+        self.ibox(-self.indent());
         self.ty(&item.ty);
         self.end();
         self.word(";");
@@ -321,7 +321,7 @@ impl Printer<'_> {
 
     fn item_union(&mut self, item: &ItemUnion) {
         self.outer_attrs(&item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&item.vis);
         self.word("union ");
         self.ident(&item.ident);
@@ -334,7 +334,7 @@ impl Printer<'_> {
             self.word(",");
             self.hardbreak();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -588,9 +588,9 @@ impl Printer<'_> {
             }
             ItemVerbatim::ImplFlexible(item) => {
                 self.outer_attrs(&item.attrs);
-                self.cbox(INDENT);
-                self.ibox(-INDENT);
-                self.cbox(INDENT);
+                self.cbox(self.indent());
+                self.ibox(-self.indent());
+                self.cbox(self.indent());
                 self.visibility(&item.vis);
                 if item.defaultness {
                     self.word("default ");
@@ -624,7 +624,7 @@ impl Printer<'_> {
                 for impl_item in &item.items {
                     self.impl_item(impl_item);
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
                 self.hardbreak();
@@ -636,26 +636,26 @@ impl Printer<'_> {
                 self.ident(&item.ident);
                 if let Some(args) = &item.args {
                     self.word("(");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     self.ibox(0);
                     self.macro_rules_tokens(args.clone(), true);
                     self.end();
                     self.zerobreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word(")");
                 }
                 self.word(" {");
                 if !item.body.is_empty() {
                     self.neverbreak();
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.hardbreak();
                     self.ibox(0);
                     self.macro_rules_tokens(item.body.clone(), false);
                     self.end();
                     self.hardbreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                 }
                 self.word("}");
@@ -675,7 +675,7 @@ impl Printer<'_> {
                     self.word("::");
                     self.use_tree(&item.trees[0].inner);
                 } else {
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.word("{");
                     self.zerobreak();
                     self.ibox(0);
@@ -699,7 +699,7 @@ impl Printer<'_> {
                     }
                     self.end();
                     self.trailing_comma(true);
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.word("}");
                     self.end();
                 }
@@ -751,7 +751,7 @@ impl Printer<'_> {
         {
             self.use_tree(&use_group.items[0]);
         } else {
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.word("{");
             self.zerobreak();
             self.ibox(0);
@@ -772,7 +772,7 @@ impl Printer<'_> {
             }
             self.end();
             self.trailing_comma(true);
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.word("}");
             self.end();
         }
@@ -792,7 +792,7 @@ impl Printer<'_> {
 
     fn foreign_item_fn(&mut self, foreign_item: &ForeignItemFn) {
         self.outer_attrs(&foreign_item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&foreign_item.vis);
         self.signature(&foreign_item.sig);
         self.where_clause_semi(&foreign_item.sig.generics.where_clause);
@@ -952,7 +952,7 @@ impl Printer<'_> {
 
     fn trait_item_fn(&mut self, trait_item: &TraitItemFn) {
         self.outer_attrs(&trait_item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.signature(&trait_item.sig);
         if let Some(block) = &trait_item.default {
             self.where_clause_for_body(&trait_item.sig.generics.where_clause);
@@ -962,7 +962,7 @@ impl Printer<'_> {
             for stmt in &block.stmts {
                 self.stmt(stmt);
             }
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.end();
             self.word("}");
         } else {
@@ -974,7 +974,7 @@ impl Printer<'_> {
 
     fn trait_item_type(&mut self, trait_item: &TraitItemType) {
         self.outer_attrs(&trait_item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.word("type ");
         self.ident(&trait_item.ident);
         self.generics(&trait_item.generics);
@@ -990,7 +990,7 @@ impl Printer<'_> {
         if let Some((_eq_token, default)) = &trait_item.default {
             self.word(" = ");
             self.neverbreak();
-            self.ibox(-INDENT);
+            self.ibox(-self.indent());
             self.ty(default);
             self.end();
         }
@@ -1144,7 +1144,7 @@ impl Printer<'_> {
 
     fn impl_item_fn(&mut self, impl_item: &ImplItemFn) {
         self.outer_attrs(&impl_item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&impl_item.vis);
         if impl_item.defaultness.is_some() {
             self.word("default ");
@@ -1157,7 +1157,7 @@ impl Printer<'_> {
         for stmt in &impl_item.block.stmts {
             self.stmt(stmt);
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
         self.hardbreak();
@@ -1165,7 +1165,7 @@ impl Printer<'_> {
 
     fn impl_item_type(&mut self, impl_item: &ImplItemType) {
         self.outer_attrs(&impl_item.attrs);
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.visibility(&impl_item.vis);
         if impl_item.defaultness.is_some() {
             self.word("default ");
@@ -1175,7 +1175,7 @@ impl Printer<'_> {
         self.generics(&impl_item.generics);
         self.word(" = ");
         self.neverbreak();
-        self.ibox(-INDENT);
+        self.ibox(-self.indent());
         self.ty(&impl_item.ty);
         self.end();
         self.where_clause_oneline_semi(&impl_item.generics.where_clause);
@@ -1306,10 +1306,10 @@ impl Printer<'_> {
             self.variadic(variadic);
             self.zerobreak();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
-        self.cbox(-INDENT);
+        self.cbox(-self.indent());
         self.return_type(&signature.output);
         self.end();
     }
@@ -1379,7 +1379,7 @@ impl Printer<'_> {
 mod verbatim {
     use crate::algorithm::Printer;
     use crate::iter::IterDelimited;
-    use crate::INDENT;
+
     use syn::ext::IdentExt;
     use syn::parse::{ParseStream, Result};
     use syn::{
@@ -1604,7 +1604,7 @@ mod verbatim {
     impl Printer<'_> {
         pub fn flexible_item_const(&mut self, item: &FlexibleItemConst) {
             self.outer_attrs(&item.attrs);
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.visibility(&item.vis);
             if item.defaultness {
                 self.word("default ");
@@ -1613,13 +1613,13 @@ mod verbatim {
             self.ident(&item.ident);
             self.generics(&item.generics);
             self.word(": ");
-            self.cbox(-INDENT);
+            self.cbox(-self.indent());
             self.ty(&item.ty);
             self.end();
             if let Some(value) = &item.value {
                 self.word(" = ");
                 self.neverbreak();
-                self.ibox(-INDENT);
+                self.ibox(-self.indent());
                 self.expr(value);
                 self.end();
             }
@@ -1630,7 +1630,7 @@ mod verbatim {
 
         pub fn flexible_item_fn(&mut self, item: &FlexibleItemFn) {
             self.outer_attrs(&item.attrs);
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.visibility(&item.vis);
             if item.defaultness {
                 self.word("default ");
@@ -1644,7 +1644,7 @@ mod verbatim {
                 for stmt in body {
                     self.stmt(stmt);
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
             } else {
@@ -1677,7 +1677,7 @@ mod verbatim {
 
         pub fn flexible_item_type(&mut self, item: &FlexibleItemType) {
             self.outer_attrs(&item.attrs);
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             self.visibility(&item.vis);
             if item.defaultness {
                 self.word("default ");
@@ -1698,7 +1698,7 @@ mod verbatim {
                 self.where_clause_oneline(&item.generics.where_clause);
                 self.word("= ");
                 self.neverbreak();
-                self.ibox(-INDENT);
+                self.ibox(-self.indent());
                 self.ty(definition);
                 self.end();
                 self.where_clause_oneline_semi(&item.where_clause_after_eq);

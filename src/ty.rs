@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use proc_macro2::TokenStream;
 use syn::{
     Abi, BareFnArg, BareVariadic, ReturnType, Type, TypeArray, TypeBareFn, TypeGroup,
@@ -51,7 +51,7 @@ impl Printer<'_> {
             self.abi(abi);
         }
         self.word("fn(");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for bare_fn_arg in ty.inputs.iter().delimited() {
             self.bare_fn_arg(&bare_fn_arg);
@@ -61,7 +61,7 @@ impl Printer<'_> {
             self.bare_variadic(variadic);
             self.zerobreak();
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
         self.return_type(&ty.output);
@@ -146,7 +146,7 @@ impl Printer<'_> {
 
     fn type_tuple(&mut self, ty: &TypeTuple) {
         self.word("(");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.zerobreak();
         for elem in ty.elems.iter().delimited() {
             self.ty(&elem);
@@ -157,7 +157,7 @@ impl Printer<'_> {
                 self.trailing_comma(elem.is_last);
             }
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word(")");
     }
@@ -252,7 +252,7 @@ impl Printer<'_> {
                 self.word("...");
             }
             TypeVerbatim::AnonStruct(ty) => {
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.word("struct {");
                 self.hardbreak_if_nonempty();
                 for field in &ty.fields.named {
@@ -260,12 +260,12 @@ impl Printer<'_> {
                     self.word(",");
                     self.hardbreak();
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
             }
             TypeVerbatim::AnonUnion(ty) => {
-                self.cbox(INDENT);
+                self.cbox(self.indent());
                 self.word("union {");
                 self.hardbreak_if_nonempty();
                 for field in &ty.fields.named {
@@ -273,7 +273,7 @@ impl Printer<'_> {
                     self.word(",");
                     self.hardbreak();
                 }
-                self.offset(-INDENT);
+                self.offset(-self.indent());
                 self.end();
                 self.word("}");
             }

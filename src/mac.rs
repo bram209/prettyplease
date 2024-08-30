@@ -1,7 +1,7 @@
 use crate::algorithm::Printer;
 use crate::path::PathKind;
 use crate::token::Token;
-use crate::INDENT;
+
 use proc_macro2::{Delimiter, Spacing, TokenStream};
 use syn::{spanned::Spanned, Ident, Macro, MacroDelimiter};
 
@@ -47,7 +47,7 @@ impl Printer<'_> {
         };
         self.word(open);
         if !mac.tokens.is_empty() {
-            self.cbox(INDENT);
+            self.cbox(self.indent());
             delimiter_break(self);
             self.ibox(0);
 
@@ -59,7 +59,7 @@ impl Printer<'_> {
 
             self.end();
             delimiter_break(self);
-            self.offset(-INDENT);
+            self.offset(-self.indent());
             self.end();
         }
         self.word(close);
@@ -85,7 +85,7 @@ impl Printer<'_> {
         self.word("macro_rules! ");
         self.ident(name);
         self.word(" {");
-        self.cbox(INDENT);
+        self.cbox(self.indent());
         self.hardbreak_if_nonempty();
         let mut state = State::Start;
         for tt in rules.clone() {
@@ -94,13 +94,13 @@ impl Printer<'_> {
                 (Start, Token::Group(delimiter, stream)) => {
                     self.delimiter_open(delimiter);
                     if !stream.is_empty() {
-                        self.cbox(INDENT);
+                        self.cbox(self.indent());
                         self.zerobreak();
                         self.ibox(0);
                         self.macro_rules_tokens(stream, true);
                         self.end();
                         self.zerobreak();
-                        self.offset(-INDENT);
+                        self.offset(-self.indent());
                         self.end();
                     }
                     self.delimiter_close(delimiter);
@@ -118,13 +118,13 @@ impl Printer<'_> {
                     self.word(" {");
                     self.neverbreak();
                     if !stream.is_empty() {
-                        self.cbox(INDENT);
+                        self.cbox(self.indent());
                         self.hardbreak();
                         self.ibox(0);
                         self.macro_rules_tokens(stream, false);
                         self.end();
                         self.hardbreak();
-                        self.offset(-INDENT);
+                        self.offset(-self.indent());
                         self.end();
                     }
                     self.word("}");
@@ -146,7 +146,7 @@ impl Printer<'_> {
             }
             _ => self.hardbreak(),
         }
-        self.offset(-INDENT);
+        self.offset(-self.indent());
         self.end();
         self.word("}");
     }
@@ -249,7 +249,7 @@ mod standard_library {
     use crate::algorithm::Printer;
     use crate::iter::IterDelimited;
     use crate::path::PathKind;
-    use crate::INDENT;
+
     use syn::ext::IdentExt;
     use syn::parse::{Parse, ParseStream, Parser, Result};
     use syn::{
@@ -564,23 +564,23 @@ mod standard_library {
             match &known_macro {
                 KnownMacro::Expr(expr) => {
                     self.word("(");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     self.expr(expr);
                     self.zerobreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word(")");
                 }
                 KnownMacro::Exprs(exprs) => {
                     self.word("(");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     for elem in exprs.iter().delimited() {
                         self.expr(&elem);
                         self.trailing_comma(elem.is_last);
                     }
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word(")");
                 }
@@ -591,7 +591,7 @@ mod standard_library {
                 }
                 KnownMacro::Matches(matches) => {
                     self.word("(");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     self.expr(&matches.expression);
                     self.word(",");
@@ -603,13 +603,13 @@ mod standard_library {
                         self.expr(guard);
                     }
                     self.zerobreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word(")");
                 }
                 KnownMacro::ThreadLocal(items) => {
                     self.word(" {");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.hardbreak_if_nonempty();
                     for item in items {
                         self.outer_attrs(&item.attrs);
@@ -626,33 +626,33 @@ mod standard_library {
                         self.end();
                         self.hardbreak();
                     }
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word("}");
                     semicolon = false;
                 }
                 KnownMacro::VecArray(vec) => {
                     self.word("[");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     for elem in vec.iter().delimited() {
                         self.expr(&elem);
                         self.trailing_comma(elem.is_last);
                     }
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word("]");
                 }
                 KnownMacro::VecRepeat { elem, n } => {
                     self.word("[");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     self.expr(elem);
                     self.word(";");
                     self.space();
                     self.expr(n);
                     self.zerobreak();
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word("]");
                 }
@@ -677,13 +677,13 @@ mod standard_library {
                 Cfg::Call(ident, args) => {
                     self.ident(ident);
                     self.word("(");
-                    self.cbox(INDENT);
+                    self.cbox(self.indent());
                     self.zerobreak();
                     for arg in args.iter().delimited() {
                         self.cfg(&arg);
                         self.trailing_comma(arg.is_last);
                     }
-                    self.offset(-INDENT);
+                    self.offset(-self.indent());
                     self.end();
                     self.word(")");
                 }

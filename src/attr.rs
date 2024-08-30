@@ -1,6 +1,6 @@
 use crate::algorithm::Printer;
 use crate::path::PathKind;
-use crate::INDENT;
+
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 use syn::{AttrStyle, Attribute, Expr, Lit, MacroDelimiter, Meta, MetaList, MetaNameValue};
 
@@ -160,7 +160,7 @@ impl Printer<'_> {
                     match delimiter {
                         Delimiter::Parenthesis => {
                             self.word("(");
-                            self.cbox(INDENT);
+                            self.cbox(self.indent());
                             self.zerobreak();
                             state = Punct;
                         }
@@ -183,7 +183,7 @@ impl Printer<'_> {
                             if state != TrailingComma {
                                 self.zerobreak();
                             }
-                            self.offset(-INDENT);
+                            self.offset(-self.indent());
                             self.end();
                             self.word(")");
                             state = Punct;

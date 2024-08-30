@@ -1,5 +1,5 @@
 use crate::algorithm::Printer;
-use crate::INDENT;
+
 use syn::{BinOp, Expr, Stmt};
 
 impl Printer<'_> {
@@ -20,17 +20,17 @@ impl Printer<'_> {
                         self.end();
                         self.neverbreak();
                         if let Expr::Block(expr) = diverge.as_ref() {
-                            self.cbox(INDENT);
+                            self.cbox(self.indent());
                             self.small_block(&expr.block, &[]);
                             self.end();
                         } else {
                             self.word("{");
                             self.space();
-                            self.ibox(INDENT);
+                            self.ibox(self.indent());
                             self.expr(diverge);
                             self.end();
                             self.space();
-                            self.offset(-INDENT);
+                            self.offset(-self.indent());
                             self.word("}");
                         }
                     } else {
