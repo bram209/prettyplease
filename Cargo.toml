@@ -18,9 +18,9 @@ rust-version = "1.60"
 verbatim = ["syn/parsing"]
 
 [dependencies]
-proc-macro2 = { workspace = true }
-syn = { workspace = true }
-leptosfmt-pretty-printer = { workspace = true }
+proc-macro2.workspace = true
+syn.workspace = true
+leptosfmt-pretty-printer.workspace = true
 
 [dev-dependencies]
 indoc = "2"
