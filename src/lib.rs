@@ -382,19 +382,19 @@ use syn::{Expr, File, Generics};
 // Every line is allowed at least this much space, even if highly indented.
 // const MIN_SPACE: isize = 60;
 
-pub fn unparse(
+pub fn unparse<'a>(
     file: &File,
-    printer: &mut leptosfmt_pretty_printer::Printer,
-    macro_formatter: Option<&dyn MacroFormatter>,
+    printer: &'a mut leptosfmt_pretty_printer::Printer,
+    macro_formatter: Option<&'a mut dyn MacroFormatter>,
 ) {
     let mut p = Printer::new(printer, macro_formatter);
     p.file(file);
 }
 
-pub fn unparse_expr(
+pub fn unparse_expr<'a>(
     expr: &Expr,
-    printer: &mut leptosfmt_pretty_printer::Printer,
-    macro_formatter: Option<&dyn MacroFormatter>,
+    printer: &'a mut leptosfmt_pretty_printer::Printer,
+    macro_formatter: Option<&'a mut dyn MacroFormatter>,
 ) {
     let mut p = Printer::new(printer, macro_formatter);
     p.expr(expr);

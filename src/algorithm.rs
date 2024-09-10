@@ -3,18 +3,18 @@ use std::borrow::Cow;
 use syn::Macro;
 
 pub trait MacroFormatter {
-    fn format(&self, printer: &mut leptosfmt_pretty_printer::Printer, mac: &Macro) -> bool;
+    fn format(&mut self, printer: &mut leptosfmt_pretty_printer::Printer, mac: &Macro) -> bool;
 }
 
 pub struct Printer<'a> {
     pub inner: &'a mut leptosfmt_pretty_printer::Printer,
-    pub macro_formatter: Option<&'a dyn MacroFormatter>,
+    pub macro_formatter: Option<&'a mut dyn MacroFormatter>,
 }
 
 impl<'a> Printer<'a> {
     pub fn new(
         printer: &'a mut leptosfmt_pretty_printer::Printer,
-        macro_formatter: Option<&'a dyn MacroFormatter>,
+        macro_formatter: Option<&'a mut dyn MacroFormatter>,
     ) -> Self {
         Self {
             inner: printer,

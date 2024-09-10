@@ -28,7 +28,7 @@ impl Printer<'_> {
         //     .collect::<Vec<_>>()
         //     .join("::");
 
-        if let Some(macro_formatter) = &self.macro_formatter {
+        if let Some(macro_formatter) = self.macro_formatter.as_deref_mut() {
             if macro_formatter.format(self.inner, mac) {
                 return;
             }
