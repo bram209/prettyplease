@@ -371,7 +371,7 @@ mod ty;
 
 pub use crate::algorithm::MacroFormatter;
 use crate::algorithm::Printer;
-use syn::{Expr, File, Generics, Pat};
+use syn::File;
 
 // Target line width.
 // const MARGIN: isize = 89;
