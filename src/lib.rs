@@ -371,7 +371,7 @@ mod ty;
 
 pub use crate::algorithm::MacroFormatter;
 use crate::algorithm::Printer;
-use syn::{Expr, File, Generics};
+use syn::{Expr, File, Generics, Pat};
 
 // Target line width.
 // const MARGIN: isize = 89;
@@ -391,16 +391,11 @@ pub fn unparse<'a>(
     p.file(file);
 }
 
-pub fn unparse_expr<'a>(
-    expr: &Expr,
+pub fn unparse_fn<'a>(
     printer: &'a mut leptosfmt_pretty_printer::Printer,
     macro_formatter: Option<&'a mut dyn MacroFormatter>,
+    f: impl FnOnce(&mut Printer),
 ) {
     let mut p = Printer::new(printer, macro_formatter);
-    p.expr(expr);
-}
-
-pub fn unparse_generics(generics: &Generics, printer: &mut leptosfmt_pretty_printer::Printer) {
-    let mut p = Printer::new(printer, None);
-    p.generics(generics)
+    f(&mut p);
 }
