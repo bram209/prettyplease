@@ -53,4 +53,8 @@ impl<'a> Printer<'a> {
     pub fn end_with_max_width(&mut self, max: isize) {
         self.inner.end_with_max_width(max)
     }
+
+    pub fn ends_with(&self, c: char) -> bool {
+        self.inner.ends_with(c)
+    }
 }

@@ -1,4 +1,5 @@
 use crate::algorithm::Printer;
+use crate::fixup::FixupContext;
 use crate::iter::IterDelimited;
 use crate::path::PathKind;
 
@@ -36,7 +37,7 @@ impl Printer<'_> {
         self.word("[");
         self.ty(&ty.elem);
         self.word("; ");
-        self.expr(&ty.len);
+        self.expr(&ty.len, FixupContext::NONE);
         self.word("]");
     }
 
