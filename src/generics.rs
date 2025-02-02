@@ -48,7 +48,7 @@ impl Printer<'_> {
         self.word(">");
     }
 
-    fn generic_param(&mut self, generic_param: &GenericParam) {
+    pub fn generic_param(&mut self, generic_param: &GenericParam) {
         match generic_param {
             GenericParam::Type(type_param) => self.type_param(type_param),
             GenericParam::Lifetime(lifetime_param) => self.lifetime_param(lifetime_param),
